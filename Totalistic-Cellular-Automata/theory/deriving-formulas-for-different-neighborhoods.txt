@@ -1,0 +1,67 @@
+Per usual another problem has arose.
+
+Wolfram had used the formula 3k - 2 to calculate the number of unique averages for a one dimensional totalistic automata with a neighborhood of the left, middle, and right cells. We derived this in another doc.
+
+Now that I am moving into a 2 dimensional grid, different neighborhoods are being used, and this formula is invalid. 
+
+In this document I plan to derive formulas to calculate the averages for the von neumann and moore neighborhoods, and ideally a more generic formula to determine how to calculate the number of unique averages based on a k value and the neighborhood size.
+
+So, rehashing what we went over before, the formula 3k - 2 involves 3 cells with values ranging from 0 to (k - 1).
+
+I made a program to calculate the unique averages for a number for a given number of digits and a k value. This is what I used to derive 3k - 2
+
+What I found was that as k increased by 1, the total unique averages increased by 3 each time. Note the digits used here was 3, 1 for each cell.
+
+So then we had the formula 3k, but this wasnt right because at k = 2 we know that we should have 4 unique averages but the formula 3k gives us 6, so we add a minus 2 to get 3k - 2 which is the formula.
+
+We can follow a similar patter for these new neighborhoods.
+
+Here is the data calculated by the program for the von neumann neighborhood. a von neumann neighborhood has 5 cells ( looks like a plus ), and is 2 dimensional.
+
+These are all done with 5 digits, but varing k values.
+
+K value:                 |  2  |  3  |  4  |  5  |  6  |  7  |  8  |  9  |
+                         -------------------------------------------------
+Total Unique Averages:   |  6  | 11  | 16  | 21  | 26  | 31  | 36  | 41  |
+
+It seems that as K goes up by 1 the number of unique averages goes up by 5.
+
+Lets try 5k as the formula.
+
+k = 2 would be 5 * 2 = 10, but we have 6, so lets add a -4 to the formula to get 5k - 4
+
+Lets try 5k - 4;  
+K = 2 | 5 * 2 - 4 = 6
+K = 3 | 5 * 3 - 4 = 11 
+K = 4 | 5 * 4 - 4 = 16
+K = 5 | 5 * 5 - 4 = 21 
+K = 6 | 5 * 6 - 4 = 26 
+K = 7 | 5 * 7 - 4 = 31 
+K = 8 | 5 * 8 - 4 = 36 
+K = 9 | 5 * 9 - 4 = 41 
+
+seems to check out, so the formula to calculate the number of unique averages for a von neumann neighborhood is 5k - 4
+
+As a side note it seems that this formula is very similar to the 3k - 2 formula perhaps we can find a way that they are related?
+
+One major thing to note is that the coefficient of k is equal to the number of cells in the neighborhood, but this could be a coincidence.
+
+Supposing that previous statement is true though, where does the Constant come from? Is there a way we can calculate it?
+
+Well to make things easier to see I'll calculate the formula for neighborhoods of values 4 - 9 and well line them up to see if we can find any patterns.
+
+Number of digits  | formula
+
+3 | 3k - 2
+4 | 4k - 3
+5 | 5k - 4
+6 | 6k - 5
+7 | 7k - 6
+8 | 8k - 7
+9 | 9k - 8
+
+So here are the results and the patter is obvious. The coefficient for k is equal to the size of the nieghborhood, and constant is equal to the size of the nieghborhood minus 1.
+
+if n = the size of the neighborhood, and k = the number of unique values each cell can have, then the formula is n*k - (n - 1)
+
+Interestingly this formula can also be used to calculate the number of unique sums for a number n digits long of base k. This has probably already been discovered but hey we derived it again :)

@@ -1,0 +1,109 @@
+This document discusses the calculation of the code that must be used to simulate john conways game of life in a totalistic cellular automata.
+
+So far we know it uses a moore neighborhood, and a k of 2.
+
+We need the code to determine which ruleset to use.
+
+Here are the verbaitum rules for the Game of Life
+
+1.    Any live cell with fewer than two live neighbours dies, as if by underpopulation.
+2.    Any live cell with two or three live neighbours lives on to the next generation.
+3.    Any live cell with more than three live neighbours dies, as if by overpopulation.
+4.    Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
+
+
+Let's break this down rule by rule. Before though we must remember that we are dealing with averages, and the only valid numbers are 0 and 1. The average is computed from 9 cells. So the biggest sum is 9 making the biggest average 9 / 9 or 1
+
+I have also run this through my unique sum calculator program and there are 10 unique sums possible, their values are 0 - 9. [0,1,2,3,4,5,6,7,8,9]
+
+Here is a more graphical representation of the ruleset.
+
+Averages: | 9/9 | 8/9 | 7/9 | 6/9 | 5/9 | 4/9 | 3/9 | 2/9 | 1/9 | 0/9 |
+          -------------------------------------------------------------
+Result:   |  ?  |  ?  |  ?  |  ?  |  ?  |  ?  |  ?  |  ?  |  ?  |  ?  |
+
+Rule 1. A live cell means the center is a 1, less than two live neighbors means that the sum is < 3. In this case the cell is a 0 (dies). The sums that fit this bill are, [0, 1, 2]. So each respective average for these sums needs to evauluate to 0.
+
+Our updated table looks like this:
+
+Averages: | 9/9 | 8/9 | 7/9 | 6/9 | 5/9 | 4/9 | 3/9 | 2/9 | 1/9 | 0/9 |
+          -------------------------------------------------------------
+Result:   |  ?  |  ?  |  ?  |  ?  |  ?  |  ?  |  ?  |  0  |  0  |  0  |
+
+
+Rule 2. A live cell means the center is 1, two or three live neighbors means the sums [3, 4], and the result is 1 (live). So [3,4] will be 1
+
+Averages: | 9/9 | 8/9 | 7/9 | 6/9 | 5/9 | 4/9 | 3/9 | 2/9 | 1/9 | 0/9 |
+          -------------------------------------------------------------
+Result:   |  ?  |  ?  |  ?  |  ?  |  ?  |  1  |  1  |  0  |  0  |  0  |
+
+
+Rule 3. Live cell, center is 1, more than 3 live neightbors dies, this results in sums [9,8,7,6,5]. These all result in a 0 ( death ).
+
+Averages: | 9/9 | 8/9 | 7/9 | 6/9 | 5/9 | 4/9 | 3/9 | 2/9 | 1/9 | 0/9 |
+          -------------------------------------------------------------
+Result:   |  0  |  0  |  0  |  0  |  0  |  1  |  1  |  0  |  0  |  0  |
+
+Rule 4. A dead cell, center is 0, with exactly 3 live neighbors, results in a 1. This means the sum [3] needs to be a 1, which it already is.
+
+So if I did everything right the rule should be as follows:
+
+Averages: | 9/9 | 8/9 | 7/9 | 6/9 | 5/9 | 4/9 | 3/9 | 2/9 | 1/9 | 0/9 |
+          -------------------------------------------------------------
+Result:   |  0  |  0  |  0  |  0  |  0  |  1  |  1  |  0  |  0  |  0  |
+
+Sums 9-5 are overpopulation, 0-2 underpopulation, 3 and 4 live, and 3 reproduction
+
+The code here would then be: 8 + 16 = 24
+
+Lets test.
+
+After some debugging, the program is working properly, but it seems that the code above doesn't give us the game of life.
+
+After some thought and analysis it seems the issue lies in the fact that the rules say that a live cell with 2 or 3 live nieghbors remains alive, but a dead cell with only three neighbors comes back to life.
+
+This gets violated because if it has 4 live neighbors the average will be 4 and it will come back to life due to the previous rule saying that the average 4 should be a 1 ( 3 live neighbors and a live cell).
+
+I cannot think of a rule using the current technique that resolves this issue. Conditional checking can be added to check the value of the current cell but this is not how I want to go about this because that would make the program specifically a game of life.
+
+Some things we can alter, like the K value and the neighborhood.
+
+Altering the k value will likely give a result but it will be more complex.
+
+But when it comes to changing the neighborhood we can only change it from 9 (including the center cell) to 8 (not including the center cell).
+
+This initially seems counter intuitive because the problem we were having was initially because of that center cell.
+
+I'll entertain the thought and see where it goes though.
+
+Lets grab those rules for reference again. This time I'm using a more condensed and straighforward version from Wolfram Mathworld
+
+
+    1. Death: if the count is less than 2 or greater than 3, the current cell is switched off.
+
+    2. Survival: if (a) the count is exactly 2, or (b) the count is exactly 3 and the current cell is on, the current cell is left unchanged.
+
+    3. Birth: if the current cell is off and the count is exactly 3, the current cell is switched on. 
+
+Count here references that 8 cell neighborhood, NOT including the central cell.
+
+So, lets make another rule chart to start. Note the difference
+
+Averages: | 8/8 | 7/8 | 6/8 | 5/8 | 4/8 | 3/8 | 2/8 | 1/8 | 0/8 |
+          -------------------------------------------------------
+Result:   |  ?  |  ?  |  ?  |  ?  |  ?  |  ?  |  ?  |  ?  |  ?  |
+
+Looking at rule one we see that if the sum is < 2 or > 3 than the result is 0.
+
+Averages: | 8/8 | 7/8 | 6/8 | 5/8 | 4/8 | 3/8 | 2/8 | 1/8 | 0/8 |
+          -------------------------------------------------------
+Result:   |  0  |  0  |  0  |  0  |  0  |  ?  |  ?  |  0  |  0  |
+
+That already filled out most of the table. -_-
+
+Rule 2 says that if the count is 2 or 3 then the result is 1. However, this is dependent on the current cell being 1.
+
+If we added this to the rule then rule 3 would be violated with the same issue as before, a new cell would be birthed when it has 2 live surrounding cells, but it can only be birthed when there are exactly 3 live surrounding cells.
+
+
+It seems then that In wolfram code and a 2 dimensional grid, with k = 2 and a moore neighborhood, there isn't a way to create john conways game of life.
